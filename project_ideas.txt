@@ -1,0 +1,7 @@
+From https://www.reddit.com/r/golang/comments/7pnw2e/fun_golang_projects/
+Text adventure game
+FIREcalc + cFIREsim incl visualization - extention more complex prediction models
+DND NPC Generator
+Pixel Art Generator
+
+Mini: Cipher tool
