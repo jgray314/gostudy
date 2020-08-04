@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Can assume input string with charcters only in set [a-z]
 type cipher interface {
 	name() string
 	encrypt(string) string
@@ -37,23 +38,7 @@ func cond_append(s string, cond bool, t rune, f rune) string {
 	return s + string(f)
 }
 
-// Funcation ideas from http://practicalcryptography.com/ciphers/classical-era/
-type atbash struct{}
-
-func (a atbash) name() string {
-	return "atbash"
-}
-func (a atbash) encrypt(s string) string {
-	r := ""
-	for _, a := range s {
-		r = r + string('z'-a+'a')
-	}
-	return r
-}
-
-func (a atbash) decrypt(s string) string {
-	return a.encrypt(s)
-}
+// Function ideas from http://practicalcryptography.com/ciphers/classical-era/
 
 func main() {
 	s := "Hello, playground"
