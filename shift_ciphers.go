@@ -1,5 +1,12 @@
 package main
 
+func CondAppend(s string, cond bool, t rune, f rune) string {
+	if cond {
+		return s + string(t)
+	}
+	return s + string(f)
+}
+
 func shift(s string, shift int) string {
 	r := ""
 	for shift < 0 {
@@ -7,37 +14,37 @@ func shift(s string, shift int) string {
 	}
 	shift = shift % 26
 	for _, a := range s {
-		r = cond_append(r, a+rune(shift) > 'z', a+rune(shift)-26, a+rune(shift))
+		r = CondAppend(r, a+rune(shift) > 'z', a+rune(shift)-26, a+rune(shift))
 	}
 	return r
 }
 
-type caesar struct {
+type Caesar struct {
 	shift int
 }
 
-func (c caesar) name() string {
-	return "caesar"
+func (c Caesar) Name() string {
+	return "Caesar"
 }
 
-func (c caesar) encrypt(s string) string {
+func (c Caesar) Encrypt(s string) string {
 	return shift(s, c.shift)
 }
 
-func (c caesar) decrypt(s string) string {
+func (c Caesar) Decrypt(s string) string {
 	return shift(s, 26-c.shift)
 }
 
-type rot13 struct{}
+type Rot13 struct{}
 
-func (r rot13) name() string {
-	return "rot13"
+func (r Rot13) Name() string {
+	return "Rot13"
 }
 
-func (r rot13) encrypt(s string) string {
+func (r Rot13) Encrypt(s string) string {
 	return shift(s, 13)
 }
 
-func (r rot13) decrypt(s string) string {
+func (r Rot13) Decrypt(s string) string {
 	return shift(s, 13)
 }

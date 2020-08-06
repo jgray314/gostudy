@@ -1,11 +1,11 @@
 package main
 
-type atbash struct{}
+type Atbash struct{}
 
-func (a atbash) name() string {
-	return "atbash"
+func (a Atbash) Name() string {
+	return "Atbash"
 }
-func (a atbash) encrypt(s string) string {
+func (a Atbash) Encrypt(s string) string {
 	r := ""
 	for _, a := range s {
 		r = r + string('z'-a+'a')
@@ -13,6 +13,6 @@ func (a atbash) encrypt(s string) string {
 	return r
 }
 
-func (a atbash) decrypt(s string) string {
-	return a.encrypt(s)
+func (a Atbash) Decrypt(s string) string {
+	return a.Encrypt(s)
 }

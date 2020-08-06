@@ -10,16 +10,16 @@ func TestRot13CaesarMatch(t *testing.T) {
 		{"something"},
 		{"abcdxyz"},
 	}
-	c13 := caesar{shift: 13}
-	r := rot13{}
+	c13 := Caesar{shift: 13}
+	r := Rot13{}
 	for _, c := range cases {
-		ce := c13.encrypt(c.in)
-		re := r.encrypt(c.in)
+		ce := c13.Encrypt(c.in)
+		re := r.Encrypt(c.in)
 		if ce != re {
 			t.Errorf("Unmatched encrypt for value %q: Caesar 13 = %q, Rot13 %q", c.in, ce, re)
 		}
-		cd := c13.decrypt(ce)
-		rd := r.decrypt(re)
+		cd := c13.Decrypt(ce)
+		rd := r.Decrypt(re)
 		if cd != rd {
 			t.Errorf("Unmatched decrypt for value %q: Caesar 13 = %q, Rot13 %q", c.in, cd, rd)
 		}
@@ -44,18 +44,18 @@ func TestCaesarEncryptDecrypt(t *testing.T) {
 		{"abcdxyz", -26, "abcdxyz"},
 	}
 	for _, c := range cases {
-		enc := caesar{shift: c.sh}.encrypt(c.dec)
+		enc := Caesar{shift: c.sh}.Encrypt(c.dec)
 		if enc != c.enc {
 			t.Errorf("Failed encryption with input %q shift %d. Wanted %q, Got:%q", c.dec, c.sh, c.enc, enc)
 		}
-		dec := caesar{shift: c.sh}.decrypt(c.enc)
+		dec := Caesar{shift: c.sh}.Decrypt(c.enc)
 		if dec != c.dec {
 			t.Errorf("Failed decryption with input %q shift %d. Wanted %q, Got:%q", c.enc, c.sh, c.dec, dec)
 		}
 	}
 }
 
-func TestCaesarDecrypt(t *testing.T) {
+func TestRo13EncryptDecrypt(t *testing.T) {
 	cases := []struct {
 		in, out string
 	}{
@@ -63,13 +63,13 @@ func TestCaesarDecrypt(t *testing.T) {
 		{"xyz", "klm"},
 		{"hello", "uryyb"},
 	}
-	r := rot13{}
+	r := Rot13{}
 	for _, c := range cases {
-		e := r.encrypt(c.in)
+		e := r.Encrypt(c.in)
 		if e != c.out {
 			t.Errorf("Failed encryption with input %q. Wanted %q, Got:%q", c.in, c.out, e)
 		}
-		d := r.decrypt(c.in)
+		d := r.Decrypt(c.in)
 		if d != c.out {
 			t.Errorf("Failed decryption with input %q. Wanted %q, Got:%q", c.in, c.out, d)
 		}

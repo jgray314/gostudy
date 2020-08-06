@@ -9,13 +9,13 @@ func TestAtbash(t *testing.T) {
 		{"abc", "zyx"},
 		{"hello", "svool"},
 	}
-	a := atbash{}
+	a := Atbash{}
 	for _, c := range cases {
-		e := a.encrypt(c.in)
+		e := a.Encrypt(c.in)
 		if e != c.out {
 			t.Errorf("Failed encrypt on %q. Expected:%q Got:%q", c.in, c.out, e)
 		}
-		d := a.encrypt(c.in)
+		d := a.Decrypt(c.in)
 		if d != c.out {
 			t.Errorf("Failed decrypt on %q. Expected:%q Got:%q", c.in, c.out, d)
 		}
