@@ -38,4 +38,5 @@ func main() {
 	PrintDemo(Atbash{}, s)
 	PrintDemo(Caesar{shift: 3}, s)
 	PrintDemo(Rot13{}, s)
+	PrintDemo(RailFence{height: 3}, s)
 }
