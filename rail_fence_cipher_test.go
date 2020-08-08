@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-func TestRailFence(t *testing.T) {
+func TestRailFence_EngcrypDecrypt(t *testing.T) {
 	cases := []struct {
 		key            int
 		clear, encrypt string
@@ -11,7 +11,11 @@ func TestRailFence(t *testing.T) {
 		{5, "hello", "hello"},
 		{27, "hello", "hello"},
 		{3, "hello", "hoell"},
-		{3, "helloplayground", "hoyuelplgrndlelprgdn"},
+		{3, "helloplayground", "hoyuelpagonllrd"},
+		{4, "helloplayground", "hluepaonloyrdlg"},
+		{7, "helloplayground", "hueonlrdlgoypal"},
+		{2, "abcdefg", "acegbdf"},
+		{3, "abcdefg", "aebdfcg"},
 	}
 	for _, c := range cases {
 		r := RailFence{c.key}

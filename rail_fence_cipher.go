@@ -1,5 +1,9 @@
 package main
 
+import (
+	"strings"
+)
+
 // http://practicalcryptography.com/ciphers/classical-era/rail-fence/
 
 type RailFence struct {
@@ -10,27 +14,36 @@ func (r RailFence) Name() string {
 	return "Rail Fence"
 }
 
+func rangeBoundAppend(i int, from, to string) string {
+	if i < len(from) {
+		return to + string([]rune(from)[i])
+	}
+	return to
+}
+
+// Assumes zero based from top
+func (r RailFence) getEncryptLevel(l int, s string) string {
+	repLen := 2*r.height - 2
+	res := ""
+	o1, o2 := l, repLen-l
+	for b := 0; b < len(s); b += repLen {
+		res = rangeBoundAppend(b+o1, s, res)
+		if o2 != o1 && o2 != repLen {
+			res = rangeBoundAppend(b+o2, s, res)
+		}
+	}
+	return res
+}
+
 func (r RailFence) Encrypt(s string) string {
 	if r.height == 1 {
 		return s
 	}
-	repLen := 2*r.height - 2
-	sLen := len(s)
-	res := ""
-	for mod := 0; mod < r.height; mod++ {
-		for mul := 0; mul < sLen; mul += repLen {
-			idx1 := mul + mod
-			idx2 := mul + repLen - mod - 1
-			if idx1 < sLen {
-				res = res + string([]rune(s)[idx1])
-			}
-			// Don't want to double list the top or bottom of the fence or overrun the string.
-			if mod != 0 && idx2 != idx1 && idx2 < sLen {
-				res = res + string([]rune(s)[idx2])
-			}
-		}
+	var res []string
+	for lvl := 0; lvl < r.height; lvl++ {
+		res = append(res, r.getEncryptLevel(lvl, s))
 	}
-	return res
+	return strings.Join(res, "")
 }
 
 func (r RailFence) Decrypt(s string) string {
