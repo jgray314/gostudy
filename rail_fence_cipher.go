@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -21,14 +22,17 @@ func rangeBoundAppend(i int, from, to string) string {
 	return to
 }
 
+func (r RailFence) repLen() int {
+	return 2*r.height - 2
+}
+
 // Assumes zero based from top
 func (r RailFence) getEncryptLevel(l int, s string) string {
-	repLen := 2*r.height - 2
 	res := ""
-	o1, o2 := l, repLen-l
-	for b := 0; b < len(s); b += repLen {
+	o1, o2 := l, r.repLen()-l
+	for b := 0; b < len(s); b += r.repLen() {
 		res = rangeBoundAppend(b+o1, s, res)
-		if o2 != o1 && o2 != repLen {
+		if o2 != o1 && o2 != r.repLen() {
 			res = rangeBoundAppend(b+o2, s, res)
 		}
 	}
@@ -46,6 +50,39 @@ func (r RailFence) Encrypt(s string) string {
 	return strings.Join(res, "")
 }
 
+// Returns if read rune from the string at the provided index was writeable,
+// and if so writes it to the provided index in writeRune and increments the writeIdx. Errors if writeIdx is out of bounds.
+func runeAssign(readIdx *int, writeIdx int, readStr string, writeRune []rune) (bool, error) {
+	if writeIdx < 0 || writeIdx >= len(writeRune) {
+		return false, fmt.Errorf("Out of bounds on runeAssign write index. writeIdx = %d writeRune = %q",
+			writeIdx, string(writeRune))
+	}
+	if *readIdx < 0 || *readIdx >= len(readStr) {
+		return false, nil
+	}
+	writeRune[writeIdx] = []rune(readStr)[*readIdx]
+	*readIdx++
+	return true, nil
+}
+
 func (r RailFence) Decrypt(s string) string {
-	return s
+	if r.height == 1 {
+		return s
+	}
+	res := make([]rune, len(s))
+	di := 0
+	for lvl := 0; lvl < r.height; lvl++ {
+		o1, o2 := lvl, r.repLen()-lvl
+		for b := 0; b < len(s) && di < len(s); b += r.repLen() {
+			if _, err := runeAssign(&di, b+o1, s, res); err != nil {
+				return err.Error()
+			}
+			if o2 != o1 && o2 != r.repLen() && b+o2 < len(s) && di < len(s) {
+				if _, err := runeAssign(&di, b+o2, s, res); err != nil {
+					return err.Error()
+				}
+			}
+		}
+	}
+	return string(res)
 }
