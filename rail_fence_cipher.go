@@ -39,15 +39,15 @@ func (r RailFence) getEncryptLevel(l int, s string) string {
 	return res
 }
 
-func (r RailFence) Encrypt(s string) string {
+func (r RailFence) Encrypt(s string) (string, error) {
 	if r.height == 1 {
-		return s
+		return s, nil
 	}
 	var res []string
 	for lvl := 0; lvl < r.height; lvl++ {
 		res = append(res, r.getEncryptLevel(lvl, s))
 	}
-	return strings.Join(res, "")
+	return strings.Join(res, ""), nil
 }
 
 // Returns if read rune from the string at the provided index was writeable,
@@ -65,9 +65,9 @@ func runeAssign(readIdx *int, writeIdx int, readStr string, writeRune []rune) (b
 	return true, nil
 }
 
-func (r RailFence) Decrypt(s string) string {
+func (r RailFence) Decrypt(s string) (string, error) {
 	if r.height == 1 {
-		return s
+		return s, nil
 	}
 	res := make([]rune, len(s))
 	di := 0
@@ -75,14 +75,14 @@ func (r RailFence) Decrypt(s string) string {
 		o1, o2 := lvl, r.repLen()-lvl
 		for b := 0; b+o1 < len(s) && di < len(s); b += r.repLen() {
 			if _, err := runeAssign(&di, b+o1, s, res); err != nil {
-				return err.Error()
+				return "", err
 			}
 			if o2 != o1 && o2 != r.repLen() && b+o2 < len(s) && di < len(s) {
 				if _, err := runeAssign(&di, b+o2, s, res); err != nil {
-					return err.Error()
+					return "", err
 				}
 			}
 		}
 	}
-	return string(res)
+	return string(res), nil
 }

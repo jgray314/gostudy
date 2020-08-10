@@ -5,6 +5,7 @@ import "testing"
 func TestRot13CaesarMatch(t *testing.T) {
 	cases := []struct {
 		in string
+		// TODO: Add error handling testcases
 	}{
 		{"helloworld"},
 		{"something"},
@@ -13,18 +14,18 @@ func TestRot13CaesarMatch(t *testing.T) {
 	c13 := Caesar{shift: 13}
 	r := Rot13{}
 	for _, c := range cases {
-		ce := c13.Encrypt(c.in)
-		re := r.Encrypt(c.in)
-		if ce != re {
-			t.Errorf("Unmatched encrypt for value %q: Caesar 13 = %q, Rot13 %q", c.in, ce, re)
+		cenc, _ := c13.Encrypt(c.in)
+		renc, _ := r.Encrypt(c.in)
+		if cenc != renc {
+			t.Errorf("Unmatched encrypt for value %q: Caesar 13 = %q, Rot13 %q", c.in, cenc, renc)
 		}
-		cd := c13.Decrypt(ce)
-		rd := r.Decrypt(re)
-		if cd != rd {
-			t.Errorf("Unmatched decrypt for value %q: Caesar 13 = %q, Rot13 %q", c.in, cd, rd)
+		cdec, _ := c13.Decrypt(cenc)
+		rdec, _ := r.Decrypt(renc)
+		if cdec != rdec {
+			t.Errorf("Unmatched decrypt for value %q: Caesar 13 = %q, Rot13 %q", c.in, cdec, rdec)
 		}
-		if cd != c.in {
-			t.Errorf("Failed decrypt. Wanted %q, Got:%q", cd, c.in)
+		if cdec != c.in {
+			t.Errorf("Failed decrypt. Wanted %q, Got:%q", cdec, c.in)
 		}
 	}
 }
@@ -44,11 +45,11 @@ func TestCaesarEncryptDecrypt(t *testing.T) {
 		{"abcdxyz", -26, "abcdxyz"},
 	}
 	for _, c := range cases {
-		enc := Caesar{shift: c.sh}.Encrypt(c.dec)
+		enc, _ := Caesar{shift: c.sh}.Encrypt(c.dec)
 		if enc != c.enc {
 			t.Errorf("Failed encryption with input %q shift %d. Wanted %q, Got:%q", c.dec, c.sh, c.enc, enc)
 		}
-		dec := Caesar{shift: c.sh}.Decrypt(c.enc)
+		dec, _ := Caesar{shift: c.sh}.Decrypt(c.enc)
 		if dec != c.dec {
 			t.Errorf("Failed decryption with input %q shift %d. Wanted %q, Got:%q", c.enc, c.sh, c.dec, dec)
 		}
@@ -58,6 +59,7 @@ func TestCaesarEncryptDecrypt(t *testing.T) {
 func TestRo13EncryptDecrypt(t *testing.T) {
 	cases := []struct {
 		in, out string
+		// TODO: Add in error handling cases
 	}{
 		{"abc", "nop"},
 		{"xyz", "klm"},
@@ -65,13 +67,13 @@ func TestRo13EncryptDecrypt(t *testing.T) {
 	}
 	r := Rot13{}
 	for _, c := range cases {
-		e := r.Encrypt(c.in)
-		if e != c.out {
-			t.Errorf("Failed encryption with input %q. Wanted %q, Got:%q", c.in, c.out, e)
+		enc, _ := r.Encrypt(c.in)
+		if enc != c.out {
+			t.Errorf("Failed encryption with input %q. Wanted %q, Got:%q", c.in, c.out, enc)
 		}
-		d := r.Decrypt(c.in)
-		if d != c.out {
-			t.Errorf("Failed decryption with input %q. Wanted %q, Got:%q", c.in, c.out, d)
+		dec, _ := r.Decrypt(c.in)
+		if dec != c.out {
+			t.Errorf("Failed decryption with input %q. Wanted %q, Got:%q", c.in, c.out, dec)
 		}
 	}
 }

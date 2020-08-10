@@ -63,11 +63,11 @@ func TestRailFence_EngcrypDecrypt(t *testing.T) {
 	}
 	for _, c := range cases {
 		r := RailFence{c.key}
-		if e := r.Encrypt(c.clear); e != c.encrypt {
-			t.Errorf("key = %d s = %q RailFence.Encrypt() = %q, want %q", c.key, c.clear, e, c.encrypt)
+		if enc, _ := r.Encrypt(c.clear); enc != c.encrypt {
+			t.Errorf("key = %d s = %q RailFence.Encrypt() = %q, want %q", c.key, c.clear, enc, c.encrypt)
 		}
-		if d := r.Decrypt(c.encrypt); d != c.clear {
-			t.Errorf("key = %d s = %q RailFence.Decrypt() = %q, want %q", c.key, c.encrypt, d, c.clear)
+		if dec, _ := r.Decrypt(c.encrypt); dec != c.clear {
+			t.Errorf("key = %d s = %q RailFence.Decrypt() = %q, want %q", c.key, c.encrypt, dec, c.clear)
 		}
 	}
 }
