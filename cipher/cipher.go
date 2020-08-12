@@ -35,14 +35,14 @@ func PrintDemo(c Cipher, s string) error {
 	if e != nil {
 		return e
 	}
-	fmt.Printf("Cypher: %s\tOriginal: %s\tNormalized: %s\tEncrypt: %s\tDecrypt: %s\n", c.Name(), s, n, enc, dec)
+	fmt.Printf("Cypher: %s\n\tOriginal: %q\n\tNormalized: %q\n\tEncrypt: %q\n\tDecrypt: %q\n", c.Name(), s, n, enc, dec)
 	return nil
 }
 
 // Function ideas from http://practicalcryptography.com/ciphers/classical-era/
 
 func main() {
-	s := "Hello, playground"
+	s := "Hello, playground. I am lengthening this message to checkout more techniques."
 	PrintDemo(Atbash{}, s)
 	PrintDemo(Caesar{shift: 3}, s)
 	PrintDemo(Rot13{}, s)
