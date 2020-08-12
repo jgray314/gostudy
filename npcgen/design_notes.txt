@@ -1,0 +1,28 @@
+Project idea is to provide an NPC generator that quickly creates an appropriate NPC for a given situation.
+Focus is on creating organic feel with occational low probability fun events (e.g. orc bard).
+
+Expect large use of math.rand and need to use a seed to avoid things being too deterministic.
+
+Use D&D Beyong to Guide order of operations
+1. race
+2. class
+3. abilities
+4. description
+    a. background + feature - ext.
+    b. proficiencies - ext.
+    c. languages - ext.
+    d. alignment
+    e. faith - ext.
+    f. wealth - ext. campaign level cfg
+    g. gender - ext. nb options
+    h. age - ext.
+    i. height - tshirt size
+    j. weight - tshirt size
+    k. hair color - ext.
+    l. eye color - ext
+    m. skin tone - ext.
+    n. personality - ext. weight by abilities
+        * Ideals
+        * Flaws
+        * Personality
+
