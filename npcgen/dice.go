@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
 
 // Allow the 7 standard dice and a coin flip.
-//const allowedsides []int = []int{2,4,6,8,10,12,20,100}
+var allowedsides = []int{2, 4, 6, 8, 10, 12, 20, 100}
 
 type Dice struct {
 	seed  int64
@@ -23,20 +24,56 @@ func (d *Dice) Init() {
 	d.r = rand.New(rand.NewSource(d.seed))
 }
 
-// Simulates a dice roll of form "{}d{}[+d]"
+func scanRoll(s string, num, sides, plus *int) (int, error) {
+	*sides = 0
+	if s[0] == 'd' {
+		*num = 1
+		if strings.Contains(s, "+") {
+			return fmt.Sscanf(s, "d%d+%d", sides, plus)
+		}
+		if strings.Contains(s, "-") {
+			n, err := fmt.Sscanf(s, "d%d-%d", sides, plus)
+			*plus *= -1
+			return n, err
+		}
+		*plus = 0
+		return fmt.Sscanf(s, "d%d", sides)
+	}
+	if strings.Contains(s, "+") {
+		return fmt.Sscanf(s, "%dd%d+%d", num, sides, plus)
+	}
+	if strings.Contains(s, "-") {
+		n, err := fmt.Sscanf(s, "%dd%d-%d", num, sides, plus)
+		*plus *= -1
+		return n, err
+	}
+	*plus = 0
+	return fmt.Sscanf(s, "%dd%d", num, sides)
+}
+
+func allowedSides(sides int) bool {
+	for _, v := range allowedsides {
+		if v == sides {
+			return true
+		}
+	}
+	return false
+}
+
+// Simulates a dice roll of form "{}d{}[+-d]"
+// Value from 1 to number of sides inclusive
 func (d Dice) Roll(s string) (int, error) {
-	num, sides, plus := 0, 0, 0
-	n, err := fmt.Sscanf(s, "%dd%d+%d", &num, &sides, &plus)
-	if n < 2 {
+	var num, sides, plus int
+	if _, err := scanRoll(s, &num, &sides, &plus); err != nil {
 		return 0, err
 	}
-	//	if !Find(allowedsides, sides) {
-	//		return 0, fmt.Errorf("Attempted number of sides %d not in allowed set %s.", sides, allowedsides)
-	//	}
+	if !allowedSides(sides) {
+		return 0, fmt.Errorf("Attempted number of sides %d not in allowed set %v.", sides, allowedsides)
+	}
 	var rolls []int
 	sum := plus
 	for r := 0; r < num; r++ {
-		v := d.r.Intn(sides)
+		v := d.r.Intn(sides) + 1
 		rolls = append(rolls, v)
 		sum += v
 	}
