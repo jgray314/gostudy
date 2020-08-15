@@ -7,21 +7,23 @@ import (
 	"time"
 )
 
+const UseTime = 0
+
 // Allow the 7 standard dice and a coin flip.
-var allowedsides = []int{2, 4, 6, 8, 10, 12, 20, 100}
+var SupportedSides = []int{2, 4, 6, 8, 10, 12, 20, 100}
 
 type Dice struct {
-	print bool
-	r     *rand.Rand
+	detail bool
+	r      *rand.Rand
 }
 
-func (d *Dice) Detail(p bool) {
-	d.print = p
+func (d *Dice) Detail(detail bool) {
+	d.detail = detail
 }
 
 // (Re)sets the dice as a random number generator based on seed (if non-zero provided) or the current time.
 func (d *Dice) Init(seed int64) {
-	if seed == 0 {
+	if seed == UseTime {
 		seed = time.Now().UnixNano()
 	}
 	d.r = rand.New(rand.NewSource(seed))
@@ -55,7 +57,7 @@ func scanRoll(s string, num, sides, plus *int) (int, error) {
 }
 
 func allowedSides(sides int) bool {
-	for _, v := range allowedsides {
+	for _, v := range SupportedSides {
 		if v == sides {
 			return true
 		}
@@ -65,33 +67,40 @@ func allowedSides(sides int) bool {
 
 // Simulates a dice roll of form "{}d{}[+-d]"
 // Value from 1 to number of sides inclusive
-func (d Dice) Roll(s string) (int, error) {
+func (d Dice) RollS(s string) (int, error) {
 	var num, sides, plus int
 	if _, err := scanRoll(s, &num, &sides, &plus); err != nil {
 		return 0, err
 	}
-	if !allowedSides(sides) {
-		return 0, fmt.Errorf("Attempted number of sides %d not in allowed set %v.", sides, allowedsides)
-	}
 	var rolls []int
 	sum := plus
 	for r := 0; r < num; r++ {
-		v := d.r.Intn(sides) + 1
+		v, e := d.Roll(sides)
+		if e != nil {
+			return 0, e
+		}
 		rolls = append(rolls, v)
 		sum += v
 	}
-	if d.print {
+	if d.detail {
 		fmt.Printf("Rolling %v: %v + %d = %d\n", s, rolls, plus, sum)
 	}
 	return sum, nil
 }
 
-// temp for demo, next unittest
-func main() {
-	d := Dice{}
-	d.Init(0)
-	d.Detail(true)
-	d.Roll("3d6")
-	d.Roll("1d20")
-	d.Roll("1d20+3")
+func (d Dice) Roll(s int) (int, error) {
+	if !allowedSides(s) {
+		return 0, fmt.Errorf("Attempted number of sides %d not in allowed set %v.", s, SupportedSides)
+	}
+	return d.r.Intn(s) + 1, nil
 }
+
+// temp for demo, next unittest
+/*func main() {
+	d := Dice{}
+	d.Init(UseTime)
+	d.Detail(true)
+	d.RollS("3d6")
+	d.RollS("1d20")
+	d.RollS("1d20+3")
+}*/

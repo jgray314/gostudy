@@ -48,7 +48,7 @@ func Test_scanRoll(t *testing.T) {
 	}
 }
 
-func TestDice_Roll(t *testing.T) {
+func TestDice_RollS(t *testing.T) {
 	d := Dice{}
 	d.Init(100)
 	type args struct {
@@ -79,13 +79,13 @@ func TestDice_Roll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.d.Roll(tt.args.s)
+			got, err := tt.d.RollS(tt.args.s)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Dice.Roll() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Dice.RollS() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Dice.Roll() = %v, want %v", got, tt.want)
+				t.Errorf("Dice.RollS() = %v, want %v", got, tt.want)
 			}
 		})
 	}
