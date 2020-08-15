@@ -49,8 +49,8 @@ func Test_scanRoll(t *testing.T) {
 }
 
 func TestDice_Roll(t *testing.T) {
-	d := Dice{seed: 100}
-	d.Init()
+	d := Dice{}
+	d.Init(100)
 	type args struct {
 		s string
 	}

@@ -11,17 +11,20 @@ import (
 var allowedsides = []int{2, 4, 6, 8, 10, 12, 20, 100}
 
 type Dice struct {
-	seed  int64
 	print bool
 	r     *rand.Rand
 }
 
-// Resets the dice as a random number generator based on seed (if provided) or the current time.
-func (d *Dice) Init() {
-	if d.seed == 0 {
-		d.seed = time.Now().UnixNano()
+func (d *Dice) Detail(p bool) {
+	d.print = p
+}
+
+// (Re)sets the dice as a random number generator based on seed (if non-zero provided) or the current time.
+func (d *Dice) Init(seed int64) {
+	if seed == 0 {
+		seed = time.Now().UnixNano()
 	}
-	d.r = rand.New(rand.NewSource(d.seed))
+	d.r = rand.New(rand.NewSource(seed))
 }
 
 func scanRoll(s string, num, sides, plus *int) (int, error) {
@@ -85,8 +88,9 @@ func (d Dice) Roll(s string) (int, error) {
 
 // temp for demo, next unittest
 func main() {
-	d := Dice{seed: 0, print: true}
-	d.Init()
+	d := Dice{}
+	d.Init(0)
+	d.Detail(true)
 	d.Roll("3d6")
 	d.Roll("1d20")
 	d.Roll("1d20+3")
