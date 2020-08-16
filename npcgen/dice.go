@@ -56,7 +56,7 @@ func scanRoll(s string, num, sides, plus *int) (int, error) {
 	return fmt.Sscanf(s, "%dd%d", num, sides)
 }
 
-func allowedSides(sides int) bool {
+func AllowedSides(sides int) bool {
 	for _, v := range SupportedSides {
 		if v == sides {
 			return true
@@ -89,7 +89,7 @@ func (d Dice) RollS(s string) (int, error) {
 }
 
 func (d Dice) Roll(s int) (int, error) {
-	if !allowedSides(s) {
+	if !AllowedSides(s) {
 		return 0, fmt.Errorf("Attempted number of sides %d not in allowed set %v.", s, SupportedSides)
 	}
 	return d.r.Intn(s) + 1, nil
