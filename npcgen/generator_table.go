@@ -35,6 +35,10 @@ func (gt GeneratorTable) validateSize() error {
 	return nil
 }
 
+/* Takes a comma separated string of number of entries and then the entry string value. Must sum to configured size.
+* 	"50 human, 25 elf, 5 halfelf, 20 dwarf"
+*	"2 something, 3 something else, 1 nothing"
+ */
 func (gt *GeneratorTable) LoadFromString(s string) error {
 	if gt.detail {
 		fmt.Printf("Loading from table %v from string: %v", gt.name, s)
@@ -42,13 +46,17 @@ func (gt *GeneratorTable) LoadFromString(s string) error {
 	// Start by clearing
 	gt.table = nil
 	for _, p := range strings.Split(s, ",") {
-		var n int
-		var r string
-		_, e := fmt.Sscanf(p, "%d %s", &n, &r)
-		if e != nil {
-			return e
+		p = strings.TrimSpace(p)
+		idx := strings.Index(p, " ")
+		if idx == -1 {
+			return fmt.Errorf("Invalided comma separated value. Need a number followed by a space and a string. Got: %q", p)
 		}
-		r = strings.ToLower(r)
+		var n int
+		_, e := fmt.Sscanf(p[:idx], "%d", &n)
+		if e != nil {
+			return fmt.Errorf("Bad number in pair for %q. %s", p[:idx], e.Error())
+		}
+		r := strings.TrimSpace(strings.ToLower(p[idx:]))
 		if !gt.typevalidator.IsValid(r) {
 			return fmt.Errorf("Unsupported value: %v. Expected one of %v", r, gt.typevalidator.GetSupported())
 		}
@@ -63,9 +71,15 @@ func (gt *GeneratorTable) LoadFromString(s string) error {
 }
 
 func (gt GeneratorTable) Roll() (string, error) {
+	if e := gt.validateSize(); e != nil {
+		return "", fmt.Errorf("Attempt to roll against improperly initialized table. %s", e.Error())
+	}
 	v, e := gt.dice.Roll(gt.size)
 	if e != nil {
 		return "", e
+	}
+	if gt.detail {
+		fmt.Printf("Rolled %d of %d, returning %s\n", v, gt.size, gt.table[v-1])
 	}
 	return gt.table[v-1], nil
 }
