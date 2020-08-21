@@ -1,11 +1,8 @@
 package main
 
-// TODO: Generalize different tables want to support / map to allowed dice sizes. Create tests.
+import "fmt"
 
-import (
-	"fmt"
-	"strings"
-)
+// TODO: Generalize different tables want to support / map to allowed dice sizes. Create tests.
 
 // lowercase as cannonical
 type Race string
@@ -25,7 +22,9 @@ const (
 
 var SupportedRaces = []Race{Dwarf, Elf, Halfling, Human, Dragonborn, Gnome, HalfElf, HalfOrc, Tiefling}
 
-func isRace(s string) bool {
+type RaceValidator struct{}
+
+func (rv RaceValidator) IsValid(s string) bool {
 	for _, v := range SupportedRaces {
 		if s == string(v) {
 			return true
@@ -34,56 +33,53 @@ func isRace(s string) bool {
 	return false
 }
 
+func (rv RaceValidator) GetSupported() []string {
+	r := []string{}
+	for _, v := range SupportedRaces {
+		r = append(r, string(v))
+	}
+	return r
+}
+
 type RaceGen struct {
-	centIdx []Race
-	detail  bool
+	gt GeneratorTable
+}
+
+func (rg *RaceGen) Init(d Dice) {
+	rg.gt.dice = d
 }
 
 func (rg *RaceGen) Detail(detail bool) {
-	rg.detail = detail
+	rg.gt.detail = detail
 }
 
-func (rg RaceGen) validateSize() error {
-	if len(rg.centIdx) != 100 {
-		return fmt.Errorf("Table incorrect size. Expected 100, Got %d", len(rg.centIdx))
-	}
-	return nil
+func (rg *RaceGen) enforceConstraints() {
+	rg.gt.typevalidator = RaceValidator{}
+	rg.gt.size = 100
 }
 
-// Takes a comma separated string for centile counts and races initializes RaceGen to match. Must sum to 100.
-// eg. " 50 human, 25 elf, 5 halfelf, 20 dwarf"
 func (rg *RaceGen) LoadFromString(s string) error {
-	if rg.detail {
-		fmt.Println("Loading from string: ", s)
-	}
-	// Start by clearing
-	rg.centIdx = nil
-	for _, p := range strings.Split(s, ",") {
-		var n int
-		var rs string
-		_, e := fmt.Sscanf(p, "%d %s", &n, &rs)
-		if e != nil {
-			return e
-		}
-		rs = strings.ToLower(rs)
-		if !isRace(rs) {
-			return fmt.Errorf("Unsupported race: %v. Expected one of %v", s, SupportedRaces)
-		}
-		r := Race(strings.ToLower(rs))
-		for i := 0; i < n; i++ {
-			rg.centIdx = append(rg.centIdx, r)
-		}
-	}
-	if rg.detail {
-		fmt.Println("Loaded table to be validated:\n", rg.centIdx)
-	}
-	return rg.validateSize()
+	rg.enforceConstraints()
+	return rg.gt.LoadFromString(s)
 }
 
-// TODO add load from CSV
+// TODO: load from CSV.
+
+func (rg RaceGen) Roll() (Race, error) {
+	rg.enforceConstraints()
+	rs, e := rg.gt.Roll()
+	return Race(rs), e
+}
 
 func main() {
 	rg := RaceGen{}
+	d := Dice{}
+	d.Init(121)
+	rg.Init(d)
 	rg.Detail(true)
-	rg.LoadFromString("50 human, 5 dwarf, 10 elf, 5 halfling, 5 halfelf, 5 gnome, 5 halforc, 3 dragonborn, 2 tiefling")
+	rg.LoadFromString("50 human, 10 dwarf, 10 elf, 5 halfling, 10 halfelf, 5 gnome, 5 halforc, 3 dragonborn, 2 tiefling")
+	s, e := rg.Roll()
+	fmt.Println(s, e)
+	s, e = rg.Roll()
+	fmt.Println(s, e)
 }

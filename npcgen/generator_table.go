@@ -26,11 +26,11 @@ type GeneratorTable struct {
 
 func (gt GeneratorTable) validateSize() error {
 	if !AllowedSides(gt.size) {
-		return fmt.Errorf("Table is not of a size that can be roll. Got %d, Expected one of %v", gt.size, SupportedSides)
+		return fmt.Errorf("Table is not of a size that can be roll. Got %d, Expected one of %v\n", gt.size, SupportedSides)
 	}
 	len := len(gt.table)
 	if len != gt.size {
-		return fmt.Errorf("Invalid table size. Got %d, Expected %d./n", len, gt.size)
+		return fmt.Errorf("Invalid table size. Got %d, Expected %d.\n", len, gt.size)
 	}
 	return nil
 }
@@ -41,7 +41,7 @@ func (gt GeneratorTable) validateSize() error {
  */
 func (gt *GeneratorTable) LoadFromString(s string) error {
 	if gt.detail {
-		fmt.Printf("Loading from table %v from string: %v", gt.name, s)
+		fmt.Printf("Loading from table %v from string: %v\n", gt.name, s)
 	}
 	// Start by clearing
 	gt.table = nil
@@ -49,16 +49,16 @@ func (gt *GeneratorTable) LoadFromString(s string) error {
 		p = strings.TrimSpace(p)
 		idx := strings.Index(p, " ")
 		if idx == -1 {
-			return fmt.Errorf("Invalided comma separated value. Need a number followed by a space and a string. Got: %q", p)
+			return fmt.Errorf("Invalided comma separated value. Need a number followed by a space and a string. Got: %q\n", p)
 		}
 		var n int
 		_, e := fmt.Sscanf(p[:idx], "%d", &n)
 		if e != nil {
-			return fmt.Errorf("Bad number in pair for %q. %s", p[:idx], e.Error())
+			return fmt.Errorf("Bad number in pair for %q. %s\n", p[:idx], e.Error())
 		}
 		r := strings.TrimSpace(strings.ToLower(p[idx:]))
 		if !gt.typevalidator.IsValid(r) {
-			return fmt.Errorf("Unsupported value: %v. Expected one of %v", r, gt.typevalidator.GetSupported())
+			return fmt.Errorf("Unsupported value: %v. Expected one of %v\n", r, gt.typevalidator.GetSupported())
 		}
 		for i := 0; i < n; i++ {
 			gt.table = append(gt.table, r)
@@ -72,7 +72,7 @@ func (gt *GeneratorTable) LoadFromString(s string) error {
 
 func (gt GeneratorTable) Roll() (string, error) {
 	if e := gt.validateSize(); e != nil {
-		return "", fmt.Errorf("Attempt to roll against improperly initialized table. %s", e.Error())
+		return "", fmt.Errorf("Attempt to roll against improperly initialized table. %s\n", e.Error())
 	}
 	v, e := gt.dice.Roll(gt.size)
 	if e != nil {

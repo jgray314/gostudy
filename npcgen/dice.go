@@ -90,9 +90,13 @@ func (d Dice) RollS(s string) (int, error) {
 
 func (d Dice) Roll(s int) (int, error) {
 	if !AllowedSides(s) {
-		return 0, fmt.Errorf("Attempted number of sides %d not in allowed set %v.", s, SupportedSides)
+		return 0, fmt.Errorf("Attempted number of sides %d not in allowed set %v.\n", s, SupportedSides)
 	}
-	return d.r.Intn(s) + 1, nil
+	r := d.r.Intn(s) + 1
+	if d.detail {
+		fmt.Printf("Rolling %v: %v\n", s, r)
+	}
+	return r, nil
 }
 
 // temp for demo, next unittest
