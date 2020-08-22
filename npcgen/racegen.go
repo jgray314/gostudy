@@ -2,9 +2,6 @@ package main
 
 import "fmt"
 
-// TODO: Generalize different tables want to support / map to allowed dice sizes. Create tests.
-
-// lowercase as cannonical
 type Race string
 
 // Fun with enums
