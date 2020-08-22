@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 )
 
@@ -68,6 +71,39 @@ func (gt *GeneratorTable) LoadFromString(s string) error {
 		fmt.Println("Loaded table to be validated:\n", gt.table)
 	}
 	return gt.validateSize()
+}
+
+func (gt *GeneratorTable) LoadFromCsvFile(filename string) error {
+	// Open the file
+	csvfile, err := os.Open(filename)
+	if err != nil {
+		return fmt.Errorf("Couldn't open the csv file. %v", err)
+	}
+	return gt.LoadFromCsvIoReader(csvfile)
+}
+
+// Expect no headers and a single column of results matching expected size
+func (gt *GeneratorTable) LoadFromCsvIoReader(csvfile io.Reader) error {
+	r := csv.NewReader(csvfile)
+	records, err := r.ReadAll()
+	if err != nil {
+		return err
+	}
+	if len(records) != gt.size {
+		return fmt.Errorf("Wrong number of rows in load CSV. Got %d, Expected %d.", len(records), gt.size)
+	}
+	gt.table = nil
+	for i, row := range records {
+		if len(row) != 1 {
+			return fmt.Errorf("Wrong number of columns in load CSV at idx %d. Got %d, Expected 1.", i, len(row))
+		}
+		r := row[0]
+		if !gt.typevalidator.IsValid(r) {
+			return fmt.Errorf("Unsupported value: %v. Expected one of %v\n", r, gt.typevalidator.GetSupported())
+		}
+		gt.table = append(gt.table, r)
+	}
+	return nil
 }
 
 func (gt GeneratorTable) Roll() (string, error) {

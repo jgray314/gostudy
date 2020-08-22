@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"strings"
 	"testing"
 )
@@ -65,6 +66,42 @@ func TestGeneratorTable_LoadFromString(t *testing.T) {
 			// Only define state of table if no error is thrown
 			if err == nil && strings.Join(tt.gt.table, " ") != strings.Join(tt.expectedtable, " ") {
 				t.Errorf("GeneratorTable.LoadFromString() unexpected result.\nGot:     %v\nExpected:%v", tt.gt.table, tt.expectedtable)
+			}
+		})
+	}
+}
+
+func TestGeneratorTable_LoadFromCsvIoReader(t *testing.T) {
+	table4 := []string{"fighter", "tank", "healer", "thief or rogue"}
+	table10 := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}
+	csv4 := strings.NewReader(strings.Join(table4, "\n"))
+	csv10 := strings.NewReader(strings.Join(table10, "\n"))
+	gt4 := GeneratorTable{name: "Caltrop", size: 4, typevalidator: StringTypeValidator{}}
+	gt10 := GeneratorTable{name: "Decimal", size: 10, typevalidator: StringTypeValidator{}}
+	gtr := GeneratorTable{name: "Reject", size: 4, typevalidator: RejectTypeValidator{}}
+	type args struct {
+		csvfile io.Reader
+	}
+	tests := []struct {
+		name          string
+		gt            *GeneratorTable
+		args          args
+		expectedtable []string
+		wantErr       bool
+	}{
+		{"Correct 4", &gt4, args{csv4}, table4, false},
+		{"Correct 10", &gt10, args{csv10}, table10, false},
+		{"Size Mismatch", &gt4, args{csv10}, nil, true},
+		{"Reject By Type Validation", &gtr, args{csv4}, nil, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.gt.LoadFromCsvIoReader(tt.args.csvfile); (err != nil) != tt.wantErr {
+				t.Errorf("GeneratorTable.LoadFromCsvIoReader() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			// Ignore undefined state on failure to load
+			if tt.expectedtable != nil && strings.Join(tt.gt.table, " ") != strings.Join(tt.expectedtable, " ") {
+				t.Errorf("Unexpected table state. Got: %v. Expected %v.", tt.gt.table, tt.expectedtable)
 			}
 		})
 	}
