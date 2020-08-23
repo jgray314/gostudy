@@ -74,7 +74,6 @@ func (gt *GeneratorTable) LoadFromString(s string) error {
 }
 
 func (gt *GeneratorTable) LoadFromCsvFile(filename string) error {
-	// Open the file
 	csvfile, err := os.Open(filename)
 	if err != nil {
 		return fmt.Errorf("Couldn't open the csv file. %v", err)

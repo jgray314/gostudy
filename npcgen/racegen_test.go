@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"strings"
 	"testing"
 )
@@ -43,6 +44,51 @@ func TestRaceGen_LoadFromString(t *testing.T) {
 	}
 }
 
+func csvFromTable(table []string) io.Reader {
+	return strings.NewReader(strings.Join(table, "\n"))
+}
+
+func newTable99() []string {
+	t := []string{}
+	for i := 0; i < 99; i++ {
+		val := SupportedRaces[i%len(SupportedRaces)]
+		t = append(t, string(val))
+	}
+	return t
+}
+
+func TestRaceGen_LoadFromCsvIoReader(t *testing.T) {
+	table99 := newTable99()
+	table100 := append(newTable99(), "human")
+	tablewrong := append(newTable99(), "witcher")
+	rg := RaceGen{}
+
+	type args struct {
+		csvfile io.Reader
+	}
+	tests := []struct {
+		name          string
+		rg            *RaceGen
+		args          args
+		expectedtable []string
+		wantErr       bool
+	}{
+		{"Table Size Failure", &rg, args{csvFromTable(table99)}, nil, true},
+		{"Table Works", &rg, args{csvFromTable(table100)}, table100, false},
+		{"Validation Failure", &rg, args{csvFromTable(tablewrong)}, nil, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.rg.LoadFromCsvIoReader(tt.args.csvfile); (err != nil) != tt.wantErr {
+				t.Errorf("RaceGen.LoadFromCsvIoReader() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.expectedtable != nil && strings.Join(tt.expectedtable, " ") != strings.Join(tt.rg.gt.table, " ") {
+				t.Errorf("RaceGen.LoadFromCsvIoReader() did not load expected table. Got: %v Expected: %v",
+					tt.rg.gt.table, tt.expectedtable)
+			}
+		})
+	}
+}
 func TestRaceGen_Roll(t *testing.T) {
 	d := Dice{}
 	d.Init(121)

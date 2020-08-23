@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 type Race string
 
@@ -60,7 +63,15 @@ func (rg *RaceGen) LoadFromString(s string) error {
 	return rg.gt.LoadFromString(s)
 }
 
-// TODO: load from CSV.
+func (rg *RaceGen) LoadFromCsvFile(filename string) error {
+	rg.enforceConstraints()
+	return rg.gt.LoadFromCsvFile(filename)
+}
+
+func (rg *RaceGen) LoadFromCsvIoReader(csvfile io.Reader) error {
+	rg.enforceConstraints()
+	return rg.gt.LoadFromCsvIoReader(csvfile)
+}
 
 func (rg RaceGen) Roll() (Race, error) {
 	rg.enforceConstraints()
