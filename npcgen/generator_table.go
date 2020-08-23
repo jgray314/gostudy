@@ -8,16 +8,19 @@ import (
 	"strings"
 )
 
+// Helper interface to aid in validation across various tables used for character generation
 type TypeValidator interface {
 	IsValid(string) bool
 	GetSupported() []string
 }
 
+// Provide a basic validator that always returns true. Useful for testing and for free text details.
 type StringTypeValidator struct{}
 
 func (stv StringTypeValidator) IsValid(s string) bool  { return true }
 func (stv StringTypeValidator) GetSupported() []string { return []string{"all strings allowed"} }
 
+// Basic outline of a table used to generate a character.
 type GeneratorTable struct {
 	name          string
 	size          int
@@ -27,6 +30,7 @@ type GeneratorTable struct {
 	dice          Dice
 }
 
+// Ensures table is set size so that dice rolls are in appropriate range.
 func (gt GeneratorTable) validateSize() error {
 	if !AllowedSides(gt.size) {
 		return fmt.Errorf("Table is not of a size that can be roll. Got %d, Expected one of %v\n", gt.size, SupportedSides)
@@ -38,10 +42,10 @@ func (gt GeneratorTable) validateSize() error {
 	return nil
 }
 
-/* Takes a comma separated string of number of entries and then the entry string value. Must sum to configured size.
-* 	"50 human, 25 elf, 5 halfelf, 20 dwarf"
-*	"2 something, 3 something else, 1 nothing"
- */
+// Takes a comma separated string of number of entries and then the entry string value. Must sum to configured size.
+//		"50 human, 25 elf, 5 halfelf, 20 dwarf"
+//		"2 something, 3 something else, 1 nothing"
+// Provide basic validation both via typevalidator and the size configurations.
 func (gt *GeneratorTable) LoadFromString(s string) error {
 	if gt.detail {
 		fmt.Printf("Loading from table %v from string: %v\n", gt.name, s)
@@ -73,6 +77,7 @@ func (gt *GeneratorTable) LoadFromString(s string) error {
 	return gt.validateSize()
 }
 
+// Interface to load from a csv file. Heavy lifting managed by LoadFomCsvIoReader
 func (gt *GeneratorTable) LoadFromCsvFile(filename string) error {
 	csvfile, err := os.Open(filename)
 	if err != nil {
@@ -81,7 +86,8 @@ func (gt *GeneratorTable) LoadFromCsvFile(filename string) error {
 	return gt.LoadFromCsvIoReader(csvfile)
 }
 
-// Expect no headers and a single column of results matching expected size
+// Basic csv reader.
+// Expect no headers and a single column of inputs, with number matching required table size.
 func (gt *GeneratorTable) LoadFromCsvIoReader(csvfile io.Reader) error {
 	r := csv.NewReader(csvfile)
 	records, err := r.ReadAll()
@@ -105,6 +111,7 @@ func (gt *GeneratorTable) LoadFromCsvIoReader(csvfile io.Reader) error {
 	return nil
 }
 
+// Rolls the dice against the current table state and returns the string at the identified index.
 func (gt GeneratorTable) Roll() (string, error) {
 	if e := gt.validateSize(); e != nil {
 		return "", fmt.Errorf("Attempt to roll against improperly initialized table. %s\n", e.Error())

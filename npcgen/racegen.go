@@ -8,6 +8,7 @@ import (
 type Race string
 
 // Fun with enums
+// Initially limiting to the set of PHB player races.
 const (
 	Dwarf      Race = "dwarf"
 	Elf             = "elf"
@@ -41,6 +42,9 @@ func (rv RaceValidator) GetSupported() []string {
 	return r
 }
 
+// This is fairly simple since character race is historically the base building block in creating characters.
+// The load functions here are intend to make it relatively quick and easy to drop in situationally tailored race distributions
+// for a location or situation in a campaign.
 type RaceGen struct {
 	gt GeneratorTable
 }

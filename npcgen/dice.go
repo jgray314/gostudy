@@ -29,6 +29,12 @@ func (d *Dice) Init(seed int64) {
 	d.r = rand.New(rand.NewSource(seed))
 }
 
+// Helper function to convert complex string input into
+//   num - number of dice to be rolled
+//   sides - number of sides of the dice to be rolled
+//   plus - additional adjustments to total sum returned after roll
+// Returns results of the roll and error messages
+// results are undefined behavior if an error is also returned
 func scanRoll(s string, num, sides, plus *int) (int, error) {
 	*sides = 0
 	if s[0] == 'd' {
@@ -56,6 +62,7 @@ func scanRoll(s string, num, sides, plus *int) (int, error) {
 	return fmt.Sscanf(s, "%dd%d", num, sides)
 }
 
+// Returns if sides in the the set of SupportedSides.
 func AllowedSides(sides int) bool {
 	for _, v := range SupportedSides {
 		if v == sides {
@@ -88,6 +95,7 @@ func (d Dice) RollS(s string) (int, error) {
 	return sum, nil
 }
 
+// Simulates the roll of a single dice with s sides. Note must be one of the SupportedSides set.
 func (d Dice) Roll(s int) (int, error) {
 	if !AllowedSides(s) {
 		return 0, fmt.Errorf("Attempted number of sides %d not in allowed set %v.\n", s, SupportedSides)
@@ -98,13 +106,3 @@ func (d Dice) Roll(s int) (int, error) {
 	}
 	return r, nil
 }
-
-// temp for demo, next unittest
-/*func main() {
-	d := Dice{}
-	d.Init(UseTime)
-	d.Detail(true)
-	d.RollS("3d6")
-	d.RollS("1d20")
-	d.RollS("1d20+3")
-}*/
