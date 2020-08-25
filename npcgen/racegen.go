@@ -23,6 +23,8 @@ const (
 
 var SupportedRaces = []Race{Dwarf, Elf, Halfling, Human, Dragonborn, Gnome, HalfElf, HalfOrc, Tiefling}
 
+// TODO: Add ethnicity support for sub-classification
+
 type RaceValidator struct{}
 
 func (rv RaceValidator) IsValid(s string) bool {

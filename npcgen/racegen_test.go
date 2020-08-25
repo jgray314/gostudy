@@ -6,12 +6,14 @@ import (
 	"testing"
 )
 
+var coveragestring = "50 human, 10 dwarf, 10 elf, 5 halfling, 10 halfelf, 5 gnome, 5 halforc, 3 dragonborn, 2 tiefling"
+
 func TestRaceGen_LoadFromString(t *testing.T) {
 	rg := RaceGen{}
 	gt := GeneratorTable{size: 100, typevalidator: StringTypeValidator{}}
 	gt.LoadFromString("100 human")
 	dullt := gt.table
-	gt.LoadFromString("50 human, 10 dwarf, 10 elf, 5 halfling, 10 halfelf, 5 gnome, 5 halforc, 3 dragonborn, 2 tiefling")
+	gt.LoadFromString(coveragestring)
 	allt := gt.table
 	type args struct {
 		s string
@@ -26,7 +28,7 @@ func TestRaceGen_LoadFromString(t *testing.T) {
 		{"Dull Success", &rg, args{"100 human"}, dullt, false},
 		{"Dull Failure", &rg, args{"99 human"}, nil, true},
 		{"Rollable Wrong Number", &rg, args{"20 human"}, nil, true},
-		{"Accept All Race", &rg, args{"50 human, 10 dwarf, 10 elf, 5 halfling, 10 halfelf, 5 gnome, 5 halforc, 3 dragonborn, 2 tiefling"}, allt, false},
+		{"Accept All Race", &rg, args{coveragestring}, allt, false},
 		{"All Race Wrong Number", &rg, args{"50 human, 10 dwarf, 10 elf, 5 halfling, 10 halfelf, 5 gnome, 5 halforc, 3 dragonborn, 1 tiefling"}, nil, true},
 		{"One Invalid", &rg, args{"99 human, 1 diety"}, nil, true},
 		{"All Invalid", &rg, args{"25 warg, 25 ent, 50 eagle"}, nil, true},
@@ -48,19 +50,19 @@ func csvFromTable(table []string) io.Reader {
 	return strings.NewReader(strings.Join(table, "\n"))
 }
 
-func newTable99() []string {
+func newTable99(supported []string) []string {
 	t := []string{}
 	for i := 0; i < 99; i++ {
-		val := SupportedRaces[i%len(SupportedRaces)]
+		val := supported[i%len(supported)]
 		t = append(t, string(val))
 	}
 	return t
 }
 
 func TestRaceGen_LoadFromCsvIoReader(t *testing.T) {
-	table99 := newTable99()
-	table100 := append(newTable99(), "human")
-	tablewrong := append(newTable99(), "witcher")
+	table99 := newTable99(RaceValidator{}.GetSupported())
+	table100 := append(newTable99(RaceValidator{}.GetSupported()), "human")
+	tablewrong := append(newTable99(RaceValidator{}.GetSupported()), "witcher")
 	rg := RaceGen{}
 
 	type args struct {
@@ -93,7 +95,7 @@ func TestRaceGen_Roll(t *testing.T) {
 	d := Dice{}
 	d.Init(121)
 	rg := RaceGen{}
-	if e := rg.LoadFromString("50 human, 10 dwarf, 10 elf, 5 halfling, 10 halfelf, 5 gnome, 5 halforc, 3 dragonborn, 2 tiefling"); e != nil {
+	if e := rg.LoadFromString(coveragestring); e != nil {
 		t.Errorf("Error loading from string in setup. %v/n", e)
 	}
 	rg.Init(d)

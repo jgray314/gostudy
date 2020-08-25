@@ -46,7 +46,7 @@ type ClassGen struct {
 	dice      Dice
 	detail    bool
 	defaultgt GeneratorTable
-	// racetogt  map[Race]GeneratorTable  // For future exploration
+	// racetogt  map[Race]GeneratorTable  // For future exploration to support additional tables
 }
 
 func (cg ClassGen) enforceConstraints(gt *GeneratorTable) {
