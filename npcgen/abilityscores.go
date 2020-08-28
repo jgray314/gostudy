@@ -2,7 +2,7 @@ package main
 
 import "sort"
 
-type Abilties struct{ strength, dexterity, constitution, intelligence, wisdom, charisma int }
+type Abilities struct{ strength, dexterity, constitution, intelligence, wisdom, charisma int }
 
 func StandardAbilityValues() []int {
 	return []int{15, 14, 13, 12, 10, 8}
@@ -22,8 +22,8 @@ func RollAbilityValues(d Dice) ([]int, error) {
 	return r, nil
 }
 
-// Assigns last 4 values to random available ability types
-func randomBottom(remain []int, d Dice, a *Abilties) {
+// Assigns remaining values to random available ability types
+func randomBottom(remain []int, d Dice, a *Abilities) {
 	d.r.Shuffle(len(remain), func(i, j int) { remain[i], remain[j] = remain[j], remain[i] })
 	idx := 0
 	if a.charisma == 0 {
@@ -52,8 +52,8 @@ func randomBottom(remain []int, d Dice, a *Abilties) {
 	}
 }
 
-func AssignAbilities(c Class, av []int, d Dice) (Abilties, error) {
-	a := Abilties{}
+func AssignAbilities(c Class, av []int, d Dice) (Abilities, error) {
+	a := Abilities{}
 	switch c {
 	case Barbarian:
 		a.strength, a.constitution = av[0], av[1]
@@ -62,7 +62,7 @@ func AssignAbilities(c Class, av []int, d Dice) (Abilties, error) {
 	case Cleric:
 		v, e := d.Roll(2)
 		if e != nil {
-			return Abilties{}, e
+			return Abilities{}, e
 		}
 		if v == 0 {
 			a.wisdom, a.strength = av[0], av[1]
@@ -74,7 +74,7 @@ func AssignAbilities(c Class, av []int, d Dice) (Abilties, error) {
 	case Fighter:
 		v, e := d.Roll(2)
 		if e != nil {
-			return Abilties{}, e
+			return Abilities{}, e
 		}
 		if v == 0 {
 			a.strength, a.constitution = av[0], av[1]
@@ -90,7 +90,7 @@ func AssignAbilities(c Class, av []int, d Dice) (Abilties, error) {
 	case Rogue:
 		v, e := d.Roll(2)
 		if e != nil {
-			return Abilties{}, e
+			return Abilities{}, e
 		}
 		if v == 0 {
 			a.dexterity, a.intelligence = av[0], av[1]
@@ -104,7 +104,7 @@ func AssignAbilities(c Class, av []int, d Dice) (Abilties, error) {
 	case Wizard:
 		v, e := d.Roll(2)
 		if e != nil {
-			return Abilties{}, e
+			return Abilities{}, e
 		}
 		if v == 0 {
 			a.intelligence, a.constitution = av[0], av[1]
@@ -117,7 +117,7 @@ func AssignAbilities(c Class, av []int, d Dice) (Abilties, error) {
 }
 
 // TODO: subclass adjustments
-func AdjustAbilities(r Race, a *Abilties) {
+func AdjustAbilities(r Race, a *Abilities) {
 	switch r {
 	case Dwarf:
 		a.constitution += 2
@@ -153,5 +153,3 @@ func AdjustAbilities(r Race, a *Abilties) {
 func AbilityValueToModifier(n int) int {
 	return (n / 2) - 5
 }
-
-// TODO testing
