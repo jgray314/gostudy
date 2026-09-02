@@ -29,6 +29,7 @@ func Test_scanRoll(t *testing.T) {
 		{"No sides", args{"2d+2", &num, &sides, &plus}, 2, 2, 2, 0, true},
 		{"Extra letter mid", args{"2d3a+2", &num, &sides, &plus}, 2, 2, 3, 0, true},
 		{"Extra letter end", args{"2d3+2a", &num, &sides, &plus}, 3, 2, 3, 2, false},
+		{"Empty string", args{"", &num, &sides, &plus}, 0, 2, 0, 2, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -76,6 +77,7 @@ func TestDice_RollS(t *testing.T) {
 		{"NAN", d, args{"1d6+a"}, 0, true},
 		{"Minus", d, args{"1d20-2"}, -1, false},
 		{"Minus again", d, args{"1d20-2"}, 5, false},
+		{"Empty string", d, args{""}, 0, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

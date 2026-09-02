@@ -37,6 +37,9 @@ func (d *Dice) Init(seed int64) {
 // results are undefined behavior if an error is also returned
 func scanRoll(s string, num, sides, plus *int) (int, error) {
 	*sides = 0
+	if len(s) == 0 {
+		return 0, fmt.Errorf("Empty dice string provided.\n")
+	}
 	if s[0] == 'd' {
 		*num = 1
 		if strings.Contains(s, "+") {
