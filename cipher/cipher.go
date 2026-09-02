@@ -18,7 +18,7 @@ func Normalize(s string) string {
 	s = strings.ToLower(s)
 	r := ""
 	for _, a := range s {
-		if a >= 'a' && a < 'z' {
+		if a >= 'a' && a <= 'z' {
 			r = r + string(a)
 		}
 	}
