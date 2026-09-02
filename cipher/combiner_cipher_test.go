@@ -54,6 +54,7 @@ func TestCombiner_Encrypt(t *testing.T) {
 			args{"doingalongeroneoftheseasaproofofconcept"},
 			"ewtahtdthtquodpsccfszbuddcphqtfuoubtdtt",
 			false},
+		{"Nil Nil Empty String", Combiner{Nil{}, Nil{}}, args{""}, "", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -95,6 +96,7 @@ func TestCombiner_Decrypt(t *testing.T) {
 			args{"ewtahtdthtquodpsccfszbuddcphqtfuoubtdtt"},
 			"doingalongeroneoftheseasaproofofconcept",
 			false},
+		{"Nil Nil Empty String", Combiner{Nil{}, Nil{}}, args{""}, "", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

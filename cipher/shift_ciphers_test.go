@@ -10,6 +10,7 @@ func TestRot13CaesarMatch(t *testing.T) {
 		{"helloworld"},
 		{"something"},
 		{"abcdxyz"},
+		{""},
 	}
 	c13 := Caesar{shift: 13}
 	r := Rot13{}
@@ -43,6 +44,7 @@ func TestCaesarEncryptDecrypt(t *testing.T) {
 		{"abcdxyz", 0, "abcdxyz"},
 		{"abcdxyz", 26, "abcdxyz"},
 		{"abcdxyz", -26, "abcdxyz"},
+		{"", 5, ""},
 	}
 	for _, c := range cases {
 		enc, _ := Caesar{shift: c.sh}.Encrypt(c.dec)
@@ -64,6 +66,7 @@ func TestRo13EncryptDecrypt(t *testing.T) {
 		{"abc", "nop"},
 		{"xyz", "klm"},
 		{"hello", "uryyb"},
+		{"", ""},
 	}
 	r := Rot13{}
 	for _, c := range cases {

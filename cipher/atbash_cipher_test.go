@@ -9,6 +9,7 @@ func TestAtbash(t *testing.T) {
 	}{
 		{"abc", "zyx"},
 		{"hello", "svool"},
+		{"", ""},
 	}
 	a := Atbash{}
 	for _, c := range cases {

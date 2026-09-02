@@ -60,6 +60,7 @@ func TestRailFence_EngcrypDecrypt(t *testing.T) {
 		{7, "helloplayground", "hueonlrdlgoypal"},
 		{2, "abcdefg", "acegbdf"},
 		{3, "abcdefg", "aebdfcg"},
+		{3, "", ""},
 	}
 	for _, c := range cases {
 		r := RailFence{c.key}
