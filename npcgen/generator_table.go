@@ -77,12 +77,17 @@ func (gt *GeneratorTable) LoadFromString(s string) error {
 	return gt.validateSize()
 }
 
+// Swappable in tests so file-close behavior can be verified without relying
+// on OS-specific delete-while-open semantics.
+var openFile = func(name string) (io.ReadCloser, error) { return os.Open(name) }
+
 // Interface to load from a csv file. Heavy lifting managed by LoadFomCsvIoReader
 func (gt *GeneratorTable) LoadFromCsvFile(filename string) error {
-	csvfile, err := os.Open(filename)
+	csvfile, err := openFile(filename)
 	if err != nil {
 		return fmt.Errorf("Couldn't open the csv file. %v", err)
 	}
+	defer csvfile.Close()
 	return gt.LoadFromCsvIoReader(csvfile)
 }
 

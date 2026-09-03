@@ -108,6 +108,38 @@ func TestGeneratorTable_LoadFromCsvIoReader(t *testing.T) {
 	}
 }
 
+// Fake ReadCloser that records whether Close was called, so file-close
+// behavior can be verified without depending on OS-specific delete-while-open
+// semantics (which differ between Windows and Linux).
+type closeTrackingReader struct {
+	io.Reader
+	closed bool
+}
+
+func (c *closeTrackingReader) Close() error {
+	c.closed = true
+	return nil
+}
+
+// Regression test: LoadFromCsvFile must close the file/reader it opens.
+func TestGeneratorTable_LoadFromCsvFile_ClosesFile(t *testing.T) {
+	table4 := []string{"fighter", "tank", "healer", "thief or rogue"}
+	fake := &closeTrackingReader{Reader: strings.NewReader(strings.Join(table4, "\n"))}
+
+	origOpenFile := openFile
+	openFile = func(name string) (io.ReadCloser, error) { return fake, nil }
+	defer func() { openFile = origOpenFile }()
+
+	gt := GeneratorTable{name: "Caltrop", size: 4, typevalidator: StringTypeValidator{}}
+	if err := gt.LoadFromCsvFile("unused-path.csv"); err != nil {
+		t.Fatalf("LoadFromCsvFile() unexpected error: %v", err)
+	}
+
+	if !fake.closed {
+		t.Errorf("LoadFromCsvFile() did not close the opened file/reader")
+	}
+}
+
 func TestGeneratorTable_Roll(t *testing.T) {
 	dice := Dice{}
 	dice.Init(121) // For reproducability. Also know this particular seed has coverage
