@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"testing"
 )
 
@@ -186,7 +187,7 @@ func TestAbilityValueToModifier(t *testing.T) {
 		{30, 10},
 	}
 	for _, tt := range tests {
-		t.Run(string(tt.n), func(t *testing.T) {
+		t.Run(strconv.Itoa(tt.n), func(t *testing.T) {
 			if got := AbilityValueToModifier(tt.n); got != tt.want {
 				t.Errorf("AbilityValueToModifier(%d) = %v, want %v", tt.n, got, tt.want)
 			}
