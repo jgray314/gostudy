@@ -63,6 +63,9 @@ func (gt *GeneratorTable) LoadFromString(s string) error {
 		if e != nil {
 			return fmt.Errorf("Bad number in pair for %q. %s\n", p[:idx], e.Error())
 		}
+		if n < 0 {
+			return fmt.Errorf("Negative count not allowed for %q.\n", p[:idx])
+		}
 		r := strings.TrimSpace(strings.ToLower(p[idx:]))
 		if !gt.typevalidator.IsValid(r) {
 			return fmt.Errorf("Unsupported value: %v. Expected one of %v\n", r, gt.typevalidator.GetSupported())

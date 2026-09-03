@@ -72,6 +72,22 @@ func TestGeneratorTable_LoadFromString(t *testing.T) {
 	}
 }
 
+// Regression test: a negative count must be rejected outright, not silently
+// treated as zero entries. Uses "-4 basic, 4 basic" against a size-4 table:
+// under the bug, the negative entry silently contributes 0 entries and the
+// remaining "4 basic" exactly matches the table size, so LoadFromString
+// returns no error at all and the negative count vanishes without a trace.
+func TestGeneratorTable_LoadFromString_RejectsNegativeCount(t *testing.T) {
+	gt := GeneratorTable{name: "Caltrop", size: 4, typevalidator: StringTypeValidator{}}
+	err := gt.LoadFromString("-4 basic, 4 basic")
+	if err == nil {
+		t.Fatalf("LoadFromString() with a negative count returned no error; table = %v", gt.table)
+	}
+	if !strings.Contains(err.Error(), "-4") {
+		t.Errorf("LoadFromString() error does not mention the offending negative count. Got: %v", err)
+	}
+}
+
 func TestGeneratorTable_LoadFromCsvIoReader(t *testing.T) {
 	table4 := []string{"fighter", "tank", "healer", "thief or rogue"}
 	table10 := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"}
