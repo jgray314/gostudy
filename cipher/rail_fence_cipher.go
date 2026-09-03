@@ -40,6 +40,9 @@ func (r RailFence) getEncryptLevel(l int, s string) string {
 }
 
 func (r RailFence) Encrypt(s string) (string, error) {
+	if r.height < 1 {
+		return "", fmt.Errorf("Invalid rail fence height %d: must be at least 1", r.height)
+	}
 	if r.height == 1 {
 		return s, nil
 	}
@@ -66,6 +69,9 @@ func runeAssign(readIdx *int, writeIdx int, readStr string, writeRune []rune) (b
 }
 
 func (r RailFence) Decrypt(s string) (string, error) {
+	if r.height < 1 {
+		return "", fmt.Errorf("Invalid rail fence height %d: must be at least 1", r.height)
+	}
 	if r.height == 1 {
 		return s, nil
 	}

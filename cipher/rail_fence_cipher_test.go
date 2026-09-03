@@ -46,6 +46,29 @@ func Test_runeAssign(t *testing.T) {
 	}
 }
 
+// Regression test: non-positive height must error, not silently drop the
+// input. height == 1 (identity) must still be allowed with no error.
+func TestRailFence_NonPositiveHeight(t *testing.T) {
+	cases := []struct {
+		name   string
+		height int
+	}{
+		{"Zero", 0},
+		{"Negative", -3},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			r := RailFence{c.height}
+			if enc, err := r.Encrypt("hello"); err == nil {
+				t.Errorf("RailFence{%d}.Encrypt() = %q, nil; want an error", c.height, enc)
+			}
+			if dec, err := r.Decrypt("hello"); err == nil {
+				t.Errorf("RailFence{%d}.Decrypt() = %q, nil; want an error", c.height, dec)
+			}
+		})
+	}
+}
+
 func TestRailFence_EngcrypDecrypt(t *testing.T) {
 	cases := []struct {
 		key            int
