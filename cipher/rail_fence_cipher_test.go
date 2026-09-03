@@ -35,7 +35,7 @@ func Test_runeAssign(t *testing.T) {
 			if got != tt.want {
 				t.Errorf("runeAssign() = %v, want %v", got, tt.want)
 			}
-			if string(tt.args.readIdx) != string(tt.readIdxFinal) {
+			if tt.args.readIdx != tt.readIdxFinal {
 				t.Errorf("runeAssign updated readIdx to %d, wanted %d", tt.args.readIdx, tt.readIdxFinal)
 			}
 			if string(tt.args.writeRune) != string(tt.writeRuneFinal) {
