@@ -88,6 +88,62 @@ func TestAssignAbilities(t *testing.T) {
 	}
 }
 
+// Regression test: the coin-flip classes must be able to produce both of
+// their possible ability pairings, not just one.
+//
+// Each coin-flip class assigns av[0] and av[1] to a fixed field plus one of
+// two "swing" fields depending on the flip. We check that the swing value
+// lands on each of the two candidate fields across enough seeds.
+func TestAssignAbilities_CoinFlipReachable(t *testing.T) {
+	av := StandardAbilityValues()
+	tests := []struct {
+		name         string
+		c            Class
+		partnerValue int
+		fieldA       func(a Abilities) int
+		fieldB       func(a Abilities) int
+	}{
+		{"Cleric", Cleric, av[1],
+			func(a Abilities) int { return a.strength },
+			func(a Abilities) int { return a.constitution }},
+		{"Fighter", Fighter, av[0],
+			func(a Abilities) int { return a.strength },
+			func(a Abilities) int { return a.dexterity }},
+		{"Rogue", Rogue, av[1],
+			func(a Abilities) int { return a.intelligence },
+			func(a Abilities) int { return a.charisma }},
+		{"Wizard", Wizard, av[1],
+			func(a Abilities) int { return a.constitution },
+			func(a Abilities) int { return a.dexterity }},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			seenA, seenB := false, false
+			for seed := int64(1); seed < 200; seed++ {
+				d := Dice{}
+				d.Init(seed)
+				a, e := AssignAbilities(tt.c, av, d)
+				if e != nil {
+					t.Fatalf("AssignAbilities(%v) unexpected error: %v", tt.c, e)
+				}
+				if tt.fieldA(a) == tt.partnerValue {
+					seenA = true
+				}
+				if tt.fieldB(a) == tt.partnerValue {
+					seenB = true
+				}
+				if seenA && seenB {
+					break
+				}
+			}
+			if !seenA || !seenB {
+				t.Errorf("%s: coin flip not producing both outcomes across 200 seeds. seenA=%v seenB=%v",
+					tt.name, seenA, seenB)
+			}
+		})
+	}
+}
+
 func TestAdjustAbilities(t *testing.T) {
 	tests := []struct {
 		r   Race

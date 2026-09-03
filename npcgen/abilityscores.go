@@ -64,7 +64,7 @@ func AssignAbilities(c Class, av []int, d Dice) (Abilities, error) {
 		if e != nil {
 			return Abilities{}, e
 		}
-		if v == 0 {
+		if v == 1 {
 			a.wisdom, a.strength = av[0], av[1]
 		} else {
 			a.wisdom, a.constitution = av[0], av[1]
@@ -76,7 +76,7 @@ func AssignAbilities(c Class, av []int, d Dice) (Abilities, error) {
 		if e != nil {
 			return Abilities{}, e
 		}
-		if v == 0 {
+		if v == 1 {
 			a.strength, a.constitution = av[0], av[1]
 		} else {
 			a.dexterity, a.constitution = av[0], av[1]
@@ -92,7 +92,7 @@ func AssignAbilities(c Class, av []int, d Dice) (Abilities, error) {
 		if e != nil {
 			return Abilities{}, e
 		}
-		if v == 0 {
+		if v == 1 {
 			a.dexterity, a.intelligence = av[0], av[1]
 		} else {
 			a.dexterity, a.charisma = av[0], av[1]
@@ -106,7 +106,7 @@ func AssignAbilities(c Class, av []int, d Dice) (Abilities, error) {
 		if e != nil {
 			return Abilities{}, e
 		}
-		if v == 0 {
+		if v == 1 {
 			a.intelligence, a.constitution = av[0], av[1]
 		} else {
 			a.intelligence, a.dexterity = av[0], av[1]
